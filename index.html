@@ -1,0 +1,210 @@
+<html>
+  <head>
+
+    <style type="text/css">
+      .asecplox {
+        color: white;
+        text-align: center;
+      }
+
+      .getlink {
+        font-size: 8pt;
+      }
+
+      .container {
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+
+      .head {
+        font-size: 36pt;
+      }
+
+      .time {
+        font-size: 20pt;
+      }
+
+      .datetimeContainer {
+        padding-right: 40px;
+        float: right;
+        text-align: center;
+      }
+
+      .date {
+        font-size: 12pt;
+      }
+
+      .container {
+        -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.25);
+        -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.25);
+        box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.25);
+        /* background-color: black; */
+      }
+
+      body {
+        background: no-repeat;
+        padding-top: 0px;
+        -webkit-background-size: 100%;
+      }
+
+      .centered {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin-left: -320px;
+        margin-top: -240px;
+      }
+      .nmtime {
+        color: white;
+      }
+    </style>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jStorage/0.4.4/jstorage.min.js"></script>
+
+    <script type="text/javascript">
+
+      var notNightMode;
+      var to;
+
+      // Thanks, StackOverflow!
+      // http://stackoverflow.com/a/10211214
+
+      Date.prototype.today = function () {
+        return ((this.getMonth() < 10)?"0":"") + (this.getMonth()+1) +"/"+(((this.getDate()+1) < 10)?"0":"") + (this.getDate()) +"/"+ this.getFullYear();
+      }
+
+      Date.prototype.timeNow = function (){
+        return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+      }
+
+      function setDefault(key, val){
+        if( ! localStorage[key] ) localStorage[key]=val;
+      }
+
+      setDefault("profile_name", "person");
+      setDefault("background", JSON.stringify(["http://img2.wikia.nocookie.net/__cb20140407112557/mlp/images/b/b7/Twilight_levitating_flash_card_showing_Celestia_and_two_flyers_S4E21.png", "http://img2.wikia.nocookie.net/__cb20140407112556/mlp/images/f/f0/Rainbow_%22Got_what%3F%22_S4E21.png"]));
+      setDefault("topbarcolor", "#FFFFFF");
+
+      greetings=["Howdy, ", "Hello, ", "Hi, "];
+
+      function loadme(){
+        notNightMode=true;
+        updateGreeting();
+        $("#profile_name").text(localStorage["profile_name"]);
+        $("#set_name").change(function(){
+          $("#profile_name").text($("#set_name").val());
+          localStorage["profile_name"]=$("#set_name").val();
+        });
+        $("#set_background").change(function(){
+          localStorage["background"]=$("#set_background").val();
+        });
+        $("#set_topbarcolor").change(function(){
+          localStorage["topbarcolor"]=$("#set_topbarcolor").val();
+          updateTopbarColor();
+        })
+        setInterval(time, 500);
+        setInterval(updateGreeting, 60000);
+        $("#set_background").val(localStorage["background"]);
+        $("#set_topbarcolor").val(localStorage["topbarcolor"]);
+        $('#set_name').val(localStorage["profile_name"]);
+        $("#asecplox").hide();
+        $('body').animate({backgroundColor: '#FFFFFF'}, 'slow');
+        $('.container').animate({backgroundColor: localStorage["topbarcolor"]}, 'slow');
+        updateBackgroundPic();
+        setInterval(updateBackgroundPic, 30000);
+      }
+
+      function updateGreeting(){
+        $("#greeting").html(greetings[Math.floor(Math.random()*greetings.length)]);
+      }
+
+      function changeElement(id){
+        $("#" + id).html("<input type='text' id='" + id + "_input' /> <a href='#' class='getlink' onClick=\"changedElement('" + id + "');\">Set!</a>");
+        document.getElementById('personal_name').onClick = function(){};
+      }
+
+      function setName(){
+        $("#dialog_setname").dialog();
+      }
+
+      function time(){
+        var now = new Date();
+        $(".time").html("<b>" + now.timeNow() + "</b>");
+        $(".nmtime").html("<b>" + now.timeNow() + "</b>");
+        $(".date").html(now.today());
+        $(".nmdate").html(now.today());
+      }
+
+      function wakeUp(){
+        $("#dialog_wakeup").dialog();
+      }
+
+      function updateBackgroundPic(){
+        if( ! notNightMode ) return;
+        var bgs=JSON.parse(localStorage["background"]);
+        $("body").css({"background": "url(" + bgs[Math.floor(Math.random()*bgs.length)] + ") no-repeat"});
+        $("body").css({"background-size": "100%"});
+      }
+
+      function settings(){
+        if( $("#settings").is(":visible") ){
+          unSettings();
+          return;
+        }
+        $("#settings").fadeIn();
+      }
+
+      function unSettings(){
+        $("#settings").fadeOut();
+      }
+
+      function nightMode(){
+        notNightMode=false;
+        unSettings();
+        $(".container").fadeOut();
+        $("#night-mode").fadeIn();
+        $("#sleptat").text(new Date().timeNow());
+        $("body").css({"background": "black"}, "slow");
+      }
+
+      function unNightMode(){
+        notNightMode=true;
+        $("#night-mode").fadeOut();
+        updateBackgroundPic();
+        $(".container").fadeIn();
+      }
+
+      function updateTopbarColor(){
+        $(".container").animate({"background-color": localStorage["topbarcolor"]}, 'long');
+      }
+
+    </script>
+    <title>
+      Chromecast Homescreen
+    </title>
+  </head>
+  <body onLoad="loadme();" style="background-color: black; font-family: 'Helvetica';">
+    <h1 id="asecplox" style="" class="asecplox">Give us a second to set up, we'll be ready in a moment! ;)</h1>
+    <div id="night-mode" style="height: 100%; width: 100%; background-color: black; display: none; text-align: center; color: white;">
+      <span class="nmtime" style="font-size: 72pt !important;"></span><br>
+      <span class="nmdate" style="font-size: 56pt;"></span><br>
+      <span style="font-size: 14pt;">you went to sleep at <span id="sleptat"></span> - <u><a onClick='unNightMode();'>day mode</a></u></span>
+    </div>
+
+    <div class="container">
+      <span class="head"><span id="greeting"></span><span id="profile_name"></span>! <span class="getlink"><a href='#' onClick='settings();'>settings</a> <a href="#" onClick="nightMode();">sleep mode</a></span>
+      <span class="datetimeContainer"><span class="time"></span><br><span class="date"></span></div>
+    </div>
+
+    <div id="settings" class="centered" style="height: 480; width: 640; overflow: scrolling; background-color: white; display: none;" style="display: none;">
+      <h1>Chromecast Homescreen Settings <a class="getlink" href="#" onClick="unSettings();">(close)</a></h1>Changes are saved auto<i>magic</i>ally on your browser.<hr>
+      Array of background URLs:<br><textarea id="set_background" style="width: 100%; height: 50%;"></textarea><hr>
+      Your name: <input type="text" id="set_name"></input><hr>
+      Top-bar color (<a title="Accepts normal CSS colors. To get a hex color, you can visit http://www.color-hex.com/">?</a>): <input type="text" id="set_topbarcolor"></input>
+    </div>
+  </body>
+</html>
